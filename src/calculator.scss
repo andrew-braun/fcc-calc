@@ -1,5 +1,12 @@
-.main-container {
-	display: flex;
-	justify-content: center;
-	align-items: center;
+.calculator {
+  width: clamp(240px, 42rem, 100vw);
+  height: clamp(280px, 54rem, 75vh);
+  background: var(--dark-1);
+  border: 2px solid var(--dark-1);
+  border-radius: 0.5rem;
+}
+
+.display {
+  background: var(--light-1);
+  height: 22%;
 }

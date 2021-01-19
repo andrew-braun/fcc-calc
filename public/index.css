@@ -1,10 +1,21 @@
-/* Add CSS styles here! */
-body {
-	font-family: sans-serif;
+:root {
+  --dark-1: hsla(264, 27%, 11%, 1);
+  --light-1: hsla(0, 0%, 92%, 1);
+  --bright-1: hsla(356, 72%, 66%, 1);
+  --bright-2: hsla(209, 58%, 49%, 1);
+  --bright-3: hsla(42, 100%, 44%, 1);
 }
 
-.main-container {
-	display: flex;
-	justify-content: center;
-	align-items: center;
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 10px;
+}
+
+body {
+  font-family: sans-serif;
+  margin: 0;
+  font-size: 1.6rem;
 }
