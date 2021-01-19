@@ -1,0 +1,10 @@
+/* Add CSS styles here! */
+body {
+	font-family: sans-serif;
+}
+
+.main-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
