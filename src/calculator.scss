@@ -1,12 +1,85 @@
 .calculator {
-  width: clamp(240px, 42rem, 100vw);
-  height: clamp(280px, 54rem, 75vh);
-  background: var(--dark-1);
-  border: 2px solid var(--dark-1);
-  border-radius: 0.5rem;
+	width: clamp(240px, 36rem, 100vw);
+	height: clamp(280px, 54rem, auto);
+	background: var(--dark-1);
+	border: 2px solid var(--dark-1);
+	border-radius: 0.5rem;
 }
 
 .display {
-  background: var(--light-1);
-  height: 22%;
+	background: var(--light-1);
+	min-height: 10rem;
+	height: clamp(10rem, 22%, auto);
+}
+
+.button-container {
+	display: grid;
+	grid-template-columns: 60% 40%;
+	grid-template-areas:
+		"top-row top-row"
+		"numpad sympad";
+
+	.top-buttons {
+		grid-area: top-row;
+		display: flex;
+		min-height: 5rem;
+		margin: 0.5rem 0.5rem 0 0.5rem;
+
+		.top-button {
+			border: none;
+			min-width: 4rem;
+			margin: 0.1rem;
+		}
+
+		.calc-label {
+			flex: 1 1 auto;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			border: 2px solid var(--bright-2);
+			border-radius: 1rem;
+			margin: 0.5rem;
+		}
+		#C {
+			background: var(--bright-1);
+			width: 16rem;
+		}
+		#backspace {
+			background: var(--bright-3);
+			width: clamp(5rem, 6.5rem, 10rem);
+		}
+	}
+
+	.numpad {
+		grid-area: numpad;
+		display: flex;
+		flex-wrap: wrap;
+		margin: 0.5rem 0.1rem 0 0.5rem;
+
+		.num-button {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: clamp(5rem, 6.5rem, 10rem);
+			height: clamp(5rem, 6.5rem, 10rem);
+			margin: 0.1rem;
+			background: var(--light-1);
+			border: 0;
+		}
+	}
+	.sympad {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		margin: 0.5rem 0.5rem 0 0.1rem;
+
+		.sym-button {
+			border: none;
+			margin: 0.1rem;
+		}
+
+		#equals {
+			grid-column: 2;
+			grid-row: 3/5;
+		}
+	}
 }
