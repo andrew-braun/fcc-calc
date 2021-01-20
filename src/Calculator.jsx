@@ -43,7 +43,7 @@ export default function Calculator() {
 		// Set input to alphabetic value
 		const input = event.target.id
 
-		if (mathLookup[input]) {
+		if (mathLookup[input] || input === "zero") {
 			setCurrentExpression([...currentExpression, mathLookup[input]])
 		} else {
 			console.log("Not a valid input.")

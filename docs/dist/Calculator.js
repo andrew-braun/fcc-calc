@@ -34,7 +34,7 @@ export default function Calculator() {
   }
   function handleClickInput(event) {
     const input = event.target.id;
-    if (mathLookup[input]) {
+    if (mathLookup[input] || input === "zero") {
       setCurrentExpression([...currentExpression, mathLookup[input]]);
     } else {
       console.log("Not a valid input.");
