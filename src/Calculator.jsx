@@ -5,7 +5,6 @@ export default function Calculator() {
 	const [currentExpression, setCurrentExpression] = useState([])
 	const [currentTotal, setCurrentTotal] = useState(0)
 
-	// On number or decimal input, add to currentInput array
 	// On operator input, add currentInput to currentExpression array and clear input
 	const mathLookup = {
 		zero: 0,
@@ -28,7 +27,7 @@ export default function Calculator() {
 	}
 
 	function backspaceInput() {
-		setCurrentInput(currentExpression.slice(0, -1))
+		setCurrentExpression(currentExpression.slice(0, -1))
 	}
 
 	function resetCalculator() {
@@ -49,7 +48,6 @@ export default function Calculator() {
 		} else {
 			console.log("Not a valid input.")
 		}
-		console.log(currentInput.join(","))
 	}
 
 	// On equals input, parse array according to order of operations

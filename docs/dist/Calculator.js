@@ -23,7 +23,7 @@ export default function Calculator() {
     factorial: "!"
   };
   function backspaceInput() {
-    setCurrentInput(currentExpression.slice(0, -1));
+    setCurrentExpression(currentExpression.slice(0, -1));
   }
   function resetCalculator() {
     setCurrentExpression([]);
@@ -39,7 +39,6 @@ export default function Calculator() {
     } else {
       console.log("Not a valid input.");
     }
-    console.log(currentInput.join(","));
   }
   return /* @__PURE__ */ React.createElement("div", {
     className: "calculator",
