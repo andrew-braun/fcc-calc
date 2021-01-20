@@ -1,10 +1,15 @@
 /** @type {import("snowpack").SnowpackUserConfig } */
-module.exports = {
+;(module.exports = {
 	mount: {
 		public: "/",
 		src: "/dist",
 	},
-	plugins: ["@snowpack/plugin-react-refresh", "@snowpack/plugin-sass"],
+	plugins: [
+		"@snowpack/plugin-react-refresh",
+		"@snowpack/plugin-sass",
+		"@snowpack/plugin-webpack",
+	],
+
 	routes: [
 		/* Enable an SPA Fallback in development: */
 		// {"match": "routes", "src": ".*", "dest": "/index.html"},
@@ -23,4 +28,11 @@ module.exports = {
 		out: "docs",
 		baseUrl: "/fcc-calc/",
 	},
-}
+}),
+	{
+		optimize: {
+			bundle: true,
+			minify: true,
+			target: "es2018",
+		},
+	}
