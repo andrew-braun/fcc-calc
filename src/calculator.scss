@@ -46,7 +46,7 @@
 			color: white;
 			border-radius: 1rem;
 		}
-		#C {
+		#clear {
 			grid-column: 3 / 5;
 			background: var(--bright-1);
 		}
@@ -68,7 +68,6 @@
 			justify-content: center;
 			align-items: center;
 			min-width: 2rem;
-			min-height: 2rem;
 			margin: 0.1rem;
 			background: var(--light-1);
 			border: none;
@@ -81,6 +80,7 @@
 	.sympad {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
+		grid-template-rows: repeat(4, 5rem);
 
 		.sym-button {
 			border: none;
