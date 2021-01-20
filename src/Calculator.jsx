@@ -7,7 +7,7 @@ export default function Calculator() {
 			<div className="display"></div>
 			<div className="button-container">
 				<div className="top-buttons">
-					<div class="calc-label">CALC</div>
+					<div className="calc-label">CALC</div>
 					<button className="top-button" id="C">
 						C
 					</button>
@@ -43,7 +43,7 @@ export default function Calculator() {
 					<button className="num-button" id="eight">
 						8
 					</button>
-					<button className="num-button" id="!">
+					<button className="num-button" id="factorial">
 						!
 					</button>
 					<button className="num-button" id="0">
