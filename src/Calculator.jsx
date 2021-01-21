@@ -25,6 +25,7 @@ export default function Calculator() {
 		equals: "=",
 		factorial: "!",
 		exponent: "^",
+		root: "sqrt",
 	}
 
 	const allowedKeys = [
@@ -53,6 +54,13 @@ export default function Calculator() {
 		"C",
 	]
 
+	function addToCurrentExpression(item) {
+		setCurrentExpression((previousCurrentExpression) => [
+			...previousCurrentExpression,
+			item,
+		])
+	}
+
 	function backspaceInput() {
 		setCurrentExpression((previousCurrentExpression) =>
 			previousCurrentExpression.slice(0, -1)
@@ -65,18 +73,16 @@ export default function Calculator() {
 	}
 
 	function solveExpression() {
-		console.log(currentExpression)
+		console.log(`solveExpression: ${currentExpression}`)
 	}
 
 	function handleClickInput(event) {
 		// Set input to alphabetic value
 		const input = event.target.id
-
-		if (mathLookup[input] || input === "zero") {
-			setCurrentExpression((previousCurrentExpression) => [
-				...previousCurrentExpression,
-				mathLookup[input],
-			])
+		if (input === "equals") {
+			solveExpression()
+		} else if (mathLookup[input] || input === "zero") {
+			addToCurrentExpression(mathLookup[input])
 		} else {
 			console.log("Not a valid input.")
 		}
@@ -86,14 +92,13 @@ export default function Calculator() {
 		function handleKeyboardInput(event) {
 			if (event.key === "Backspace") {
 				event.preventDefault()
-				backspaceInput()
+				return backspaceInput()
 			} else if (event.key.toLowerCase() === "c") {
-				resetCalculator()
+				return resetCalculator()
+			} else if (event.key === "Enter" || event.key === "=") {
+				return solveExpression()
 			} else if (allowedKeys.includes(event.key)) {
-				setCurrentExpression((previousCurrentExpression) => [
-					...previousCurrentExpression,
-					event.key,
-				])
+				addToCurrentExpression(event.key)
 			} else {
 				console.log("Not a valid input.")
 			}
@@ -104,7 +109,7 @@ export default function Calculator() {
 		return () => {
 			window.removeEventListener("keydown", handleKeyboardInput)
 		}
-	}, [])
+	}, [currentExpression])
 
 	// On equals input, parse array according to order of operations
 	return (
@@ -173,10 +178,14 @@ export default function Calculator() {
 					</button>
 				</div>
 				<div className="sympad">
-					<button className="sym-button" id="exp" onClick={handleClickInput}>
+					<button
+						className="sym-button"
+						id="exponent"
+						onClick={handleClickInput}
+					>
 						x<sup>2</sup>
 					</button>
-					<button className="sym-button" id="sqrt" onClick={handleClickInput}>
+					<button className="sym-button" id="root" onClick={handleClickInput}>
 						&#8730;
 					</button>
 					<button

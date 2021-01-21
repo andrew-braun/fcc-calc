@@ -21,7 +21,8 @@ export default function Calculator() {
     divide: "/",
     equals: "=",
     factorial: "!",
-    exponent: "^"
+    exponent: "^",
+    root: "sqrt"
   };
   const allowedKeys = [
     "0",
@@ -48,6 +49,12 @@ export default function Calculator() {
     "c",
     "C"
   ];
+  function addToCurrentExpression(item) {
+    setCurrentExpression((previousCurrentExpression) => [
+      ...previousCurrentExpression,
+      item
+    ]);
+  }
   function backspaceInput() {
     setCurrentExpression((previousCurrentExpression) => previousCurrentExpression.slice(0, -1));
   }
@@ -56,15 +63,14 @@ export default function Calculator() {
     setCurrentTotal(0);
   }
   function solveExpression() {
-    console.log(currentExpression);
+    console.log(`solveExpression: ${currentExpression}`);
   }
   function handleClickInput(event) {
     const input = event.target.id;
-    if (mathLookup[input] || input === "zero") {
-      setCurrentExpression((previousCurrentExpression) => [
-        ...previousCurrentExpression,
-        mathLookup[input]
-      ]);
+    if (input === "equals") {
+      solveExpression();
+    } else if (mathLookup[input] || input === "zero") {
+      addToCurrentExpression(mathLookup[input]);
     } else {
       console.log("Not a valid input.");
     }
@@ -73,14 +79,13 @@ export default function Calculator() {
     function handleKeyboardInput(event) {
       if (event.key === "Backspace") {
         event.preventDefault();
-        backspaceInput();
+        return backspaceInput();
       } else if (event.key.toLowerCase() === "c") {
-        resetCalculator();
+        return resetCalculator();
+      } else if (event.key === "Enter" || event.key === "=") {
+        return solveExpression();
       } else if (allowedKeys.includes(event.key)) {
-        setCurrentExpression((previousCurrentExpression) => [
-          ...previousCurrentExpression,
-          event.key
-        ]);
+        addToCurrentExpression(event.key);
       } else {
         console.log("Not a valid input.");
       }
@@ -89,7 +94,7 @@ export default function Calculator() {
     return () => {
       window.removeEventListener("keydown", handleKeyboardInput);
     };
-  }, []);
+  }, [currentExpression]);
   return /* @__PURE__ */ React.createElement("div", {
     className: "calculator",
     id: "calculator"
@@ -164,11 +169,11 @@ export default function Calculator() {
     className: "sympad"
   }, /* @__PURE__ */ React.createElement("button", {
     className: "sym-button",
-    id: "exp",
+    id: "exponent",
     onClick: handleClickInput
   }, "x", /* @__PURE__ */ React.createElement("sup", null, "2")), /* @__PURE__ */ React.createElement("button", {
     className: "sym-button",
-    id: "sqrt",
+    id: "root",
     onClick: handleClickInput
   }, "\u221A"), /* @__PURE__ */ React.createElement("button", {
     className: "sym-button",
