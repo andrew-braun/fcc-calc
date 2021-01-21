@@ -20,10 +20,36 @@ export default function Calculator() {
     multiply: "*",
     divide: "/",
     equals: "=",
-    factorial: "!"
+    factorial: "!",
+    exponent: "^"
   };
+  const allowedKeys = [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    ".",
+    "+",
+    "-",
+    "*",
+    "x",
+    "X",
+    "/",
+    "=",
+    "!",
+    "^",
+    "Backspace",
+    "c",
+    "C"
+  ];
   function backspaceInput() {
-    setCurrentExpression(currentExpression.slice(0, -1));
+    setCurrentExpression((previousCurrentExpression) => previousCurrentExpression.slice(0, -1));
   }
   function resetCalculator() {
     setCurrentExpression([]);
@@ -35,11 +61,35 @@ export default function Calculator() {
   function handleClickInput(event) {
     const input = event.target.id;
     if (mathLookup[input] || input === "zero") {
-      setCurrentExpression([...currentExpression, mathLookup[input]]);
+      setCurrentExpression((previousCurrentExpression) => [
+        ...previousCurrentExpression,
+        mathLookup[input]
+      ]);
     } else {
       console.log("Not a valid input.");
     }
   }
+  useEffect(() => {
+    function handleKeyboardInput(event) {
+      if (event.key === "Backspace") {
+        event.preventDefault();
+        backspaceInput();
+      } else if (event.key.toLowerCase() === "c") {
+        resetCalculator();
+      } else if (allowedKeys.includes(event.key)) {
+        setCurrentExpression((previousCurrentExpression) => [
+          ...previousCurrentExpression,
+          event.key
+        ]);
+      } else {
+        console.log("Not a valid input.");
+      }
+    }
+    window.addEventListener("keydown", handleKeyboardInput);
+    return () => {
+      window.removeEventListener("keydown", handleKeyboardInput);
+    };
+  }, []);
   return /* @__PURE__ */ React.createElement("div", {
     className: "calculator",
     id: "calculator"

@@ -5,7 +5,7 @@ export default function Calculator() {
 	const [currentExpression, setCurrentExpression] = useState([])
 	const [currentTotal, setCurrentTotal] = useState(0)
 
-	// On operator input, add currentInput to currentExpression array and clear input
+	// Lookup table to convert words to numerals/symbols
 	const mathLookup = {
 		zero: 0,
 		one: 1,
@@ -24,10 +24,39 @@ export default function Calculator() {
 		divide: "/",
 		equals: "=",
 		factorial: "!",
+		exponent: "^",
 	}
 
+	const allowedKeys = [
+		"0",
+		"1",
+		"2",
+		"3",
+		"4",
+		"5",
+		"6",
+		"7",
+		"8",
+		"9",
+		".",
+		"+",
+		"-",
+		"*",
+		"x",
+		"X",
+		"/",
+		"=",
+		"!",
+		"^",
+		"Backspace",
+		"c",
+		"C",
+	]
+
 	function backspaceInput() {
-		setCurrentExpression(currentExpression.slice(0, -1))
+		setCurrentExpression((previousCurrentExpression) =>
+			previousCurrentExpression.slice(0, -1)
+		)
 	}
 
 	function resetCalculator() {
@@ -44,11 +73,38 @@ export default function Calculator() {
 		const input = event.target.id
 
 		if (mathLookup[input] || input === "zero") {
-			setCurrentExpression([...currentExpression, mathLookup[input]])
+			setCurrentExpression((previousCurrentExpression) => [
+				...previousCurrentExpression,
+				mathLookup[input],
+			])
 		} else {
 			console.log("Not a valid input.")
 		}
 	}
+
+	useEffect(() => {
+		function handleKeyboardInput(event) {
+			if (event.key === "Backspace") {
+				event.preventDefault()
+				backspaceInput()
+			} else if (event.key.toLowerCase() === "c") {
+				resetCalculator()
+			} else if (allowedKeys.includes(event.key)) {
+				setCurrentExpression((previousCurrentExpression) => [
+					...previousCurrentExpression,
+					event.key,
+				])
+			} else {
+				console.log("Not a valid input.")
+			}
+		}
+
+		window.addEventListener("keydown", handleKeyboardInput)
+
+		return () => {
+			window.removeEventListener("keydown", handleKeyboardInput)
+		}
+	}, [])
 
 	// On equals input, parse array according to order of operations
 	return (
