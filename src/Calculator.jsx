@@ -33,6 +33,8 @@ export default function Calculator() {
 		ln: "ln(",
 		"(": "(",
 		")": ")",
+		rightParen: "(",
+		leftParen: ")",
 		pi: Number(Math.PI.toPrecision(8)),
 		p: Number(Math.PI.toPrecision(8)),
 	}
