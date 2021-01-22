@@ -22,7 +22,16 @@ export default function Calculator() {
     equals: "=",
     factorial: "!",
     exponent: "^",
-    root: "sqrt"
+    root: "sqrt ",
+    s: "sqrt ",
+    log: "log(",
+    l: "log(",
+    n: "ln(",
+    ln: "ln(",
+    "(": "(",
+    ")": ")",
+    pi: Number(Math.PI.toPrecision(8)),
+    p: Number(Math.PI.toPrecision(8))
   };
   const allowedKeys = [
     "0",
@@ -47,21 +56,34 @@ export default function Calculator() {
     "^",
     "Backspace",
     "c",
-    "C"
+    "C",
+    "p",
+    "P",
+    "l",
+    "L",
+    "n",
+    "N",
+    "(",
+    ")"
   ];
   function addToCurrentExpression(item) {
+    const lastIndex = currentExpression.length - 1;
     if (currentExpression[0] === 0 && item !== 0) {
       setCurrentExpression([]);
     }
-    console.log(item);
-    if (currentExpression[currentExpression.length - 1] === 0 && item === 0) {
-      console.log("no!");
+    if (currentExpression[lastIndex] === 0 && item === 0) {
       return;
     }
-    setCurrentExpression((previousCurrentExpression) => [
-      ...previousCurrentExpression,
-      item
-    ]);
+    if (typeof currentExpression[lastIndex] !== "number" && typeof item !== "number" && !["pi", "log", "ln", "(", ")"].includes(currentExpression[lastIndex]) && !["pi", "log(", "ln(", "(", ")"].includes(item)) {
+      console.log(!["pi", "log(", "ln(", "(", ")"].includes(item));
+      const newCurrentExpression = currentExpression.slice(0, currentExpression.length - 1);
+      setCurrentExpression([...newCurrentExpression, item]);
+    } else {
+      setCurrentExpression((previousCurrentExpression) => [
+        ...previousCurrentExpression,
+        item
+      ]);
+    }
   }
   function backspaceInput() {
     setCurrentExpression((previousCurrentExpression) => previousCurrentExpression.slice(0, -1));
@@ -71,6 +93,7 @@ export default function Calculator() {
   }
   function solveExpression() {
     const result = parseFloat(Parser.evaluate(currentExpression.join("")).toPrecision(8));
+    console.log(result);
     setCurrentExpression([result]);
   }
   function handleClickInput(event) {
@@ -85,21 +108,26 @@ export default function Calculator() {
   }
   useEffect(() => {
     function handleKeyboardInput(event) {
-      event.preventDefault();
       if (event.key === "Backspace") {
+        event.preventDefault();
         return backspaceInput();
       } else if (event.key.toLowerCase() === "c") {
+        event.preventDefault();
         return resetCalculator();
       } else if (event.key === "Enter" || event.key === "=") {
+        event.preventDefault();
         return solveExpression();
       } else if (allowedKeys.includes(event.key)) {
+        event.preventDefault();
         if ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9].includes(Number(event.key))) {
           addToCurrentExpression(Number(event.key));
+        } else if (Object.keys(mathLookup).includes(event.key)) {
+          addToCurrentExpression(mathLookup[event.key]);
         } else {
           addToCurrentExpression(event.key);
         }
       } else {
-        console.log("Not a valid input.");
+        console.log(`${event.key} is not a valid input.`);
       }
     }
     window.addEventListener("keydown", handleKeyboardInput);
@@ -127,7 +155,31 @@ export default function Calculator() {
     className: "top-button",
     id: "backspace",
     onClick: backspaceInput
-  }, "B")), /* @__PURE__ */ React.createElement("div", {
+  }, /* @__PURE__ */ React.createElement("i", {
+    className: ["fas", "fa-backspace"].join("")
+  }))), /* @__PURE__ */ React.createElement("div", {
+    className: "top-symbols"
+  }, /* @__PURE__ */ React.createElement("button", {
+    className: "sym-button",
+    id: "pi",
+    onClick: handleClickInput
+  }, "\u03C0"), /* @__PURE__ */ React.createElement("button", {
+    className: "sym-button",
+    id: "log",
+    onClick: handleClickInput
+  }, "log"), /* @__PURE__ */ React.createElement("button", {
+    className: "sym-button",
+    id: "ln",
+    onClick: handleClickInput
+  }, "ln"), /* @__PURE__ */ React.createElement("button", {
+    className: "sym-button",
+    id: "leftParen",
+    onClick: handleClickInput
+  }, "("), /* @__PURE__ */ React.createElement("button", {
+    className: "sym-button",
+    id: "rightParen",
+    onClick: handleClickInput
+  }, ")")), /* @__PURE__ */ React.createElement("div", {
     className: "numpad"
   }, /* @__PURE__ */ React.createElement("button", {
     className: "num-button",

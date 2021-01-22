@@ -22,7 +22,7 @@
 .button-container {
   display: grid;
   grid-template-columns: 60% 40%;
-  grid-template-areas: "top-row top-row" "numpad sympad";
+  grid-template-areas: "top-row top-row" "top-sym top-sym" "numpad sympad";
   height: clamp(280px, 54rem, auto);
   margin: -0.1rem;
 }
@@ -56,12 +56,17 @@
   grid-column: 5;
   background: var(--bright-3);
 }
+.button-container .top-symbols {
+  grid-area: top-sym;
+  display: grid;
+  grid-template-columns: repeat(5, 20%);
+  grid-template-rows: 5rem;
+}
 .button-container .numpad {
   grid-area: numpad;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(4, 5rem);
-  min-height: 100%;
 }
 .button-container .numpad .num-button {
   display: flex;
@@ -76,6 +81,7 @@
   border-radius: 0 0 0 0.5rem;
 }
 .button-container .sympad {
+  grid-area: sympad;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: repeat(4, 5rem);
