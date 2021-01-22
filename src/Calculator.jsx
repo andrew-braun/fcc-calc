@@ -25,13 +25,14 @@ export default function Calculator() {
 		equals: "=",
 		factorial: "!",
 		exponent: "^",
-		root: "sqrt",
+		root: "sqrt ",
+		s: "sqrt ",
 		log: "log(",
 		l: "log(",
 		n: "ln(",
 		ln: "ln(",
-		leftParen: "(",
-		rightParen: ")",
+		"(": "(",
+		")": ")",
 		pi: Number(Math.PI.toPrecision(8)),
 		p: Number(Math.PI.toPrecision(8)),
 	}
@@ -67,6 +68,8 @@ export default function Calculator() {
 		"L",
 		"n",
 		"N",
+		"(",
+		")",
 	]
 
 	// Add a number/symbol to the currentExpression
@@ -150,14 +153,17 @@ export default function Calculator() {
 	// Add keyboard event listener in useEffect
 	useEffect(() => {
 		function handleKeyboardInput(event) {
-			event.preventDefault()
 			if (event.key === "Backspace") {
+				event.preventDefault()
 				return backspaceInput()
 			} else if (event.key.toLowerCase() === "c") {
+				event.preventDefault()
 				return resetCalculator()
 			} else if (event.key === "Enter" || event.key === "=") {
+				event.preventDefault()
 				return solveExpression()
 			} else if (allowedKeys.includes(event.key)) {
+				event.preventDefault()
 				if ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9].includes(Number(event.key))) {
 					addToCurrentExpression(Number(event.key))
 				} else if (Object.keys(mathLookup).includes(event.key)) {
@@ -166,7 +172,7 @@ export default function Calculator() {
 					addToCurrentExpression(event.key)
 				}
 			} else {
-				console.log("Not a valid input.")
+				console.log(`${event.key} is not a valid input.`)
 			}
 		}
 
@@ -194,12 +200,12 @@ export default function Calculator() {
 						id="backspace"
 						onClick={backspaceInput}
 					>
-						B
+						<i className={["fas", "fa-backspace"].join("")}></i>
 					</button>
 				</div>
 				<div className="top-symbols">
 					<button className="sym-button" id="pi" onClick={handleClickInput}>
-						pi
+						&#960;
 					</button>
 					<button className="sym-button" id="log" onClick={handleClickInput}>
 						log
