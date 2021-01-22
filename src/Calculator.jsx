@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { Parser } from "expr-eval"
 import "./calculator.scss"
 
@@ -33,8 +33,8 @@ export default function Calculator() {
 		ln: "ln(",
 		"(": "(",
 		")": ")",
-		rightParen: "(",
-		leftParen: ")",
+		rightParen: ")",
+		leftParen: "(",
 		pi: Number(Math.PI.toPrecision(8)),
 		p: Number(Math.PI.toPrecision(8)),
 	}
@@ -73,6 +73,14 @@ export default function Calculator() {
 		"(",
 		")",
 	]
+
+	const displayRef = useRef(null)
+
+	const AlwaysScrollToBottom = () => {
+		const elementRef = useRef()
+		useEffect(() => elementRef.current.scrollIntoView())
+		return <div ref={elementRef} />
+	}
 
 	// Add a number/symbol to the currentExpression
 	function addToCurrentExpression(item) {
@@ -188,8 +196,9 @@ export default function Calculator() {
 	// On equals input, parse array according to order of operations
 	return (
 		<div className="calculator" id="calculator">
-			<div className="display" id="display">
+			<div className="display" id="display" ref={displayRef}>
 				{currentExpression.join("")}
+				<AlwaysScrollToBottom />
 			</div>
 			<div className="button-container">
 				<div className="top-buttons">

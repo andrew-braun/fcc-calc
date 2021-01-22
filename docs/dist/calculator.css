@@ -1,15 +1,15 @@
 button {
-  transition: filter 0.15s ease-out, font-size 0.2s ease-in-out;
+  font-size: 1.9rem;
+  transition: filter 0.15s ease-out;
 }
 
 button:hover {
   cursor: pointer;
   filter: brightness(1.25);
-  font-size: 105%;
 }
 
 .calculator {
-  min-width: 28rem;
+  width: 34rem;
   max-height: 100%;
   margin-top: 3%;
   background: var(--dark-1);
@@ -21,12 +21,20 @@ button:hover {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  flex-wrap: wrap;
   background: var(--bright-2);
   min-height: 10rem;
-  height: clamp(10rem, 22%, auto);
+  height: clamp(10rem, 22%, 100vh);
+  max-height: 30vh;
+  max-width: 34rem;
+  margin: 0.1rem;
+  padding: 0 2rem;
   border-radius: 0.5rem 0.5rem 0 0;
   font-size: 4rem;
   color: black;
+  overflow-wrap: break-word;
+  word-break: break-all;
+  overflow-y: auto;
 }
 
 .button-container {
@@ -34,13 +42,13 @@ button:hover {
   grid-template-columns: 60% 40%;
   grid-template-areas: "top-row top-row" "top-sym top-sym" "numpad sympad";
   height: clamp(280px, 54rem, auto);
-  margin: -0.1rem;
 }
 .button-container .top-buttons {
   grid-area: top-row;
   display: grid;
   grid-template-columns: repeat(5, 20%);
   min-height: 5rem;
+  margin-top: 0.1rem;
 }
 .button-container .top-buttons .top-button {
   grid-row: 1;
@@ -84,7 +92,8 @@ button:hover {
   align-items: center;
   min-width: 2rem;
   margin: 0.1rem;
-  background: var(--light-1);
+  background: var(--dark-2);
+  color: white;
   border: none;
 }
 .button-container .numpad #factorial {

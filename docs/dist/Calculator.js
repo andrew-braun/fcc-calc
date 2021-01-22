@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "../_snowpack/pkg/react.js";
+import React, {useState, useEffect, useRef} from "../_snowpack/pkg/react.js";
 import {Parser} from "../_snowpack/pkg/expr-eval.js";
 import "./calculator.css.proxy.js";
 export default function Calculator() {
@@ -30,8 +30,8 @@ export default function Calculator() {
     ln: "ln(",
     "(": "(",
     ")": ")",
-    rightParen: "(",
-    leftParen: ")",
+    rightParen: ")",
+    leftParen: "(",
     pi: Number(Math.PI.toPrecision(8)),
     p: Number(Math.PI.toPrecision(8))
   };
@@ -68,6 +68,14 @@ export default function Calculator() {
     "(",
     ")"
   ];
+  const displayRef = useRef(null);
+  const AlwaysScrollToBottom = () => {
+    const elementRef = useRef();
+    useEffect(() => elementRef.current.scrollIntoView());
+    return /* @__PURE__ */ React.createElement("div", {
+      ref: elementRef
+    });
+  };
   function addToCurrentExpression(item) {
     const lastIndex = currentExpression.length - 1;
     if (currentExpression[0] === 0 && item !== 0) {
@@ -142,8 +150,9 @@ export default function Calculator() {
     id: "calculator"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "display",
-    id: "display"
-  }, currentExpression.join("")), /* @__PURE__ */ React.createElement("div", {
+    id: "display",
+    ref: displayRef
+  }, currentExpression.join(""), /* @__PURE__ */ React.createElement(AlwaysScrollToBottom, null)), /* @__PURE__ */ React.createElement("div", {
     className: "button-container"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "top-buttons"
