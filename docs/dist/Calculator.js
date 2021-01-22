@@ -22,7 +22,7 @@ export default function Calculator() {
     equals: "=",
     factorial: "!",
     exponent: "^",
-    root: "sqrt ",
+    sqrt: "sqrt ",
     s: "sqrt ",
     log: "log(",
     l: "log(",
@@ -158,7 +158,7 @@ export default function Calculator() {
     id: "backspace",
     onClick: backspaceInput
   }, /* @__PURE__ */ React.createElement("i", {
-    className: ["fas", "fa-backspace"].join("")
+    className: ["fas", "fa-backspace"].join(" ")
   }))), /* @__PURE__ */ React.createElement("div", {
     className: "top-symbols"
   }, /* @__PURE__ */ React.createElement("button", {
@@ -239,7 +239,7 @@ export default function Calculator() {
     onClick: handleClickInput
   }, "x", /* @__PURE__ */ React.createElement("sup", null, "y")), /* @__PURE__ */ React.createElement("button", {
     className: "sym-button",
-    id: "root",
+    id: "sqrt",
     onClick: handleClickInput
   }, "\u221A"), /* @__PURE__ */ React.createElement("button", {
     className: "sym-button",

@@ -1,3 +1,13 @@
+button {
+  transition: filter 0.15s ease-out, font-size 0.2s ease-in-out;
+}
+
+button:hover {
+  cursor: pointer;
+  filter: brightness(1.25);
+  font-size: 105%;
+}
+
 .calculator {
   min-width: 28rem;
   max-height: 100%;
@@ -91,6 +101,9 @@
   margin: 0.1rem;
   background: var(--light-1);
   filter: brightness(1.08);
+}
+.button-container .sympad .sym-button:hover {
+  filter: brightness(1.25);
 }
 .button-container .sympad #equals {
   grid-column: 2;

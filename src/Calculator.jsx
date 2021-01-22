@@ -25,7 +25,7 @@ export default function Calculator() {
 		equals: "=",
 		factorial: "!",
 		exponent: "^",
-		root: "sqrt ",
+		sqrt: "sqrt ",
 		s: "sqrt ",
 		log: "log(",
 		l: "log(",
@@ -202,7 +202,7 @@ export default function Calculator() {
 						id="backspace"
 						onClick={backspaceInput}
 					>
-						<i className={["fas", "fa-backspace"].join("")}></i>
+						<i className={["fas", "fa-backspace"].join(" ")}></i>
 					</button>
 				</div>
 				<div className="top-symbols">
@@ -284,7 +284,7 @@ export default function Calculator() {
 					>
 						x<sup>y</sup>
 					</button>
-					<button className="sym-button" id="root" onClick={handleClickInput}>
+					<button className="sym-button" id="sqrt" onClick={handleClickInput}>
 						&#8730;
 					</button>
 					<button
