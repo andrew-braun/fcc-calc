@@ -26,6 +26,14 @@ export default function Calculator() {
 		factorial: "!",
 		exponent: "^",
 		root: "sqrt",
+		log: "log(",
+		l: "log(",
+		n: "ln(",
+		ln: "ln(",
+		leftParen: "(",
+		rightParen: ")",
+		pi: Number(Math.PI.toPrecision(8)),
+		p: Number(Math.PI.toPrecision(8)),
 	}
 
 	// Restrict entered keys to mathematical symbols
@@ -53,23 +61,49 @@ export default function Calculator() {
 		"Backspace",
 		"c",
 		"C",
+		"p",
+		"P",
+		"l",
+		"L",
+		"n",
+		"N",
 	]
 
 	// Add a number/symbol to the currentExpression
 	function addToCurrentExpression(item) {
+		const lastIndex = currentExpression.length - 1
+
 		// Remove default leading 0
 		if (currentExpression[0] === 0 && item !== 0) {
 			setCurrentExpression([])
 		}
-		console.log(item)
-		if (currentExpression[currentExpression.length - 1] === 0 && item === 0) {
-			console.log("no!")
+
+		// Disallow adjacent zeroes
+		if (currentExpression[lastIndex] === 0 && item === 0) {
 			return
 		}
-		setCurrentExpression((previousCurrentExpression) => [
-			...previousCurrentExpression,
-			item,
-		])
+
+		// If adjacent symbols are typed in, replace the current with the most recent
+		// Otherwise, assume everything is correct and update with entered item
+
+		if (
+			typeof currentExpression[lastIndex] !== "number" &&
+			typeof item !== "number" &&
+			!["pi", "log", "ln", "(", ")"].includes(currentExpression[lastIndex]) &&
+			!["pi", "log(", "ln(", "(", ")"].includes(item)
+		) {
+			console.log(!["pi", "log(", "ln(", "(", ")"].includes(item))
+			const newCurrentExpression = currentExpression.slice(
+				0,
+				currentExpression.length - 1
+			)
+			setCurrentExpression([...newCurrentExpression, item])
+		} else {
+			setCurrentExpression((previousCurrentExpression) => [
+				...previousCurrentExpression,
+				item,
+			])
+		}
 	}
 
 	// Remove the last number/symbol from currentExpression
@@ -90,6 +124,7 @@ export default function Calculator() {
 			Parser.evaluate(currentExpression.join("")).toPrecision(8)
 		)
 
+		console.log(result)
 		setCurrentExpression([result])
 	}
 
@@ -125,6 +160,8 @@ export default function Calculator() {
 			} else if (allowedKeys.includes(event.key)) {
 				if ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9].includes(Number(event.key))) {
 					addToCurrentExpression(Number(event.key))
+				} else if (Object.keys(mathLookup).includes(event.key)) {
+					addToCurrentExpression(mathLookup[event.key])
 				} else {
 					addToCurrentExpression(event.key)
 				}
@@ -158,6 +195,31 @@ export default function Calculator() {
 						onClick={backspaceInput}
 					>
 						B
+					</button>
+				</div>
+				<div className="top-symbols">
+					<button className="sym-button" id="pi" onClick={handleClickInput}>
+						pi
+					</button>
+					<button className="sym-button" id="log" onClick={handleClickInput}>
+						log
+					</button>
+					<button className="sym-button" id="ln" onClick={handleClickInput}>
+						ln
+					</button>
+					<button
+						className="sym-button"
+						id="leftParen"
+						onClick={handleClickInput}
+					>
+						(
+					</button>
+					<button
+						className="sym-button"
+						id="rightParen"
+						onClick={handleClickInput}
+					>
+						)
 					</button>
 				</div>
 				<div className="numpad">
