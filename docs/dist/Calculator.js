@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from "../_snowpack/pkg/react.js";
+import {Parser} from "../_snowpack/pkg/expr-eval.js";
 import "./calculator.css.proxy.js";
 export default function Calculator() {
-  const [currentExpression, setCurrentExpression] = useState([]);
-  const [currentTotal, setCurrentTotal] = useState(0);
+  const [currentExpression, setCurrentExpression] = useState([0]);
   const mathLookup = {
     zero: 0,
     one: 1,
@@ -50,6 +50,14 @@ export default function Calculator() {
     "C"
   ];
   function addToCurrentExpression(item) {
+    if (currentExpression[0] === 0 && item !== 0) {
+      setCurrentExpression([]);
+    }
+    console.log(item);
+    if (currentExpression[currentExpression.length - 1] === 0 && item === 0) {
+      console.log("no!");
+      return;
+    }
     setCurrentExpression((previousCurrentExpression) => [
       ...previousCurrentExpression,
       item
@@ -59,11 +67,11 @@ export default function Calculator() {
     setCurrentExpression((previousCurrentExpression) => previousCurrentExpression.slice(0, -1));
   }
   function resetCalculator() {
-    setCurrentExpression([]);
-    setCurrentTotal(0);
+    setCurrentExpression([0]);
   }
   function solveExpression() {
-    console.log(`solveExpression: ${currentExpression}`);
+    const result = parseFloat(Parser.evaluate(currentExpression.join("")).toPrecision(8));
+    setCurrentExpression([result]);
   }
   function handleClickInput(event) {
     const input = event.target.id;
@@ -77,15 +85,19 @@ export default function Calculator() {
   }
   useEffect(() => {
     function handleKeyboardInput(event) {
+      event.preventDefault();
       if (event.key === "Backspace") {
-        event.preventDefault();
         return backspaceInput();
       } else if (event.key.toLowerCase() === "c") {
         return resetCalculator();
       } else if (event.key === "Enter" || event.key === "=") {
         return solveExpression();
       } else if (allowedKeys.includes(event.key)) {
-        addToCurrentExpression(event.key);
+        if ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9].includes(Number(event.key))) {
+          addToCurrentExpression(Number(event.key));
+        } else {
+          addToCurrentExpression(event.key);
+        }
       } else {
         console.log("Not a valid input.");
       }
@@ -171,7 +183,7 @@ export default function Calculator() {
     className: "sym-button",
     id: "exponent",
     onClick: handleClickInput
-  }, "x", /* @__PURE__ */ React.createElement("sup", null, "2")), /* @__PURE__ */ React.createElement("button", {
+  }, "x", /* @__PURE__ */ React.createElement("sup", null, "y")), /* @__PURE__ */ React.createElement("button", {
     className: "sym-button",
     id: "root",
     onClick: handleClickInput
