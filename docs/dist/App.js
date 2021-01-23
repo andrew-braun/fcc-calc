@@ -8,5 +8,5 @@ export default function App() {
     className: "main-container"
   }, /* @__PURE__ */ React.createElement("header", {
     className: "main-header"
-  }, /* @__PURE__ */ React.createElement("h1", null, "Calc U Later!")), /* @__PURE__ */ React.createElement(Calculator, null));
+  }), /* @__PURE__ */ React.createElement(Calculator, null));
 }

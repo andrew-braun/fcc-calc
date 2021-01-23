@@ -68,7 +68,19 @@ export default function Calculator() {
     "(",
     ")"
   ];
-  const displayRef = useRef(null);
+  const easterEggArray = [
+    "That's not a button!",
+    "Funny, right?",
+    "Never gonna give you up...",
+    "You found the easter egg!",
+    "Okay, it's a lame joke",
+    "Stop clicking!",
+    "You think you're pretty smart, don't you?",
+    "Okay, you caught me--this button doesn't do anything.",
+    "Have you ever seen a moose?",
+    "A moose once bit my sister.",
+    "What's your favorite color? Mine's #BADA55."
+  ];
   const AlwaysScrollToBottom = () => {
     const elementRef = useRef();
     useEffect(() => elementRef.current.scrollIntoView());
@@ -77,22 +89,32 @@ export default function Calculator() {
     });
   };
   function addToCurrentExpression(item) {
-    const lastIndex = currentExpression.length - 1;
-    if (currentExpression[0] === 0 && item !== 0) {
-      setCurrentExpression([]);
-    }
-    if (currentExpression[lastIndex] === 0 && item === 0) {
-      return;
-    }
-    if (typeof currentExpression[lastIndex] !== "number" && typeof item !== "number" && !["pi", "log", "ln", "(", ")"].includes(currentExpression[lastIndex]) && !["pi", "log(", "ln(", "(", ")"].includes(item)) {
-      console.log(!["pi", "log(", "ln(", "(", ")"].includes(item));
-      const newCurrentExpression = currentExpression.slice(0, currentExpression.length - 1);
-      setCurrentExpression([...newCurrentExpression, item]);
-    } else {
-      setCurrentExpression((previousCurrentExpression) => [
-        ...previousCurrentExpression,
-        item
-      ]);
+    try {
+      const lastIndex = currentExpression.length - 1;
+      const alphabeticMath = ["pi", "log(", "ln(", "(", ")"];
+      if (currentExpression[0] === 0 && item !== 0 || easterEggArray.includes(currentExpression)) {
+        setCurrentExpression([]);
+      }
+      if (currentExpression[lastIndex] === 0 && item === 0) {
+        return;
+      }
+      if (typeof currentExpression[lastIndex] !== "number" && typeof item !== "number" && !alphabeticMath.includes(currentExpression[lastIndex]) && !alphabeticMath.includes(item)) {
+        console.log(!["pi", "log(", "ln(", "(", ")"].includes(item));
+        const newCurrentExpression = currentExpression.slice(0, currentExpression.length - 1);
+        setCurrentExpression([...newCurrentExpression, item]);
+      } else if (["log(", "ln("].includes(item) && typeof currentExpression[lastIndex] === "number") {
+        setCurrentExpression((previousCurrentExpression) => [
+          ...previousCurrentExpression,
+          `*${item}`
+        ]);
+      } else {
+        setCurrentExpression((previousCurrentExpression) => [
+          ...previousCurrentExpression,
+          item
+        ]);
+      }
+    } catch (err) {
+      console.log(err);
     }
   }
   function backspaceInput() {
@@ -102,9 +124,13 @@ export default function Calculator() {
     setCurrentExpression([0]);
   }
   function solveExpression() {
-    const result = parseFloat(Parser.evaluate(currentExpression.join("")).toPrecision(8));
-    console.log(result);
-    setCurrentExpression([result]);
+    try {
+      const result = parseFloat(Parser.evaluate(currentExpression.join("")).toPrecision(8));
+      console.log(result);
+      setCurrentExpression([result]);
+    } catch (err) {
+      console.log(err);
+    }
   }
   function handleClickInput(event) {
     const input = event.target.id;
@@ -127,17 +153,15 @@ export default function Calculator() {
       } else if (event.key === "Enter" || event.key === "=") {
         event.preventDefault();
         return solveExpression();
-      } else if (allowedKeys.includes(event.key)) {
+      } else if (allowedKeys.includes(event.key.toLowerCase())) {
         event.preventDefault();
         if ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9].includes(Number(event.key))) {
           addToCurrentExpression(Number(event.key));
-        } else if (Object.keys(mathLookup).includes(event.key)) {
-          addToCurrentExpression(mathLookup[event.key]);
+        } else if (Object.keys(mathLookup).includes(event.key.toLowerCase())) {
+          addToCurrentExpression(mathLookup[event.key.toLowerCase()]);
         } else {
           addToCurrentExpression(event.key);
         }
-      } else {
-        console.log(`${event.key} is not a valid input.`);
       }
     }
     window.addEventListener("keydown", handleKeyboardInput);
@@ -145,20 +169,24 @@ export default function Calculator() {
       window.removeEventListener("keydown", handleKeyboardInput);
     };
   }, [currentExpression]);
+  function handleCalcULater() {
+    console.log(Math.floor(Math.random() * easterEggArray.length));
+    setCurrentExpression(easterEggArray[Math.floor(Math.random() * easterEggArray.length)]);
+  }
   return /* @__PURE__ */ React.createElement("div", {
     className: "calculator",
     id: "calculator"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "display",
-    id: "display",
-    ref: displayRef
-  }, currentExpression.join(""), /* @__PURE__ */ React.createElement(AlwaysScrollToBottom, null)), /* @__PURE__ */ React.createElement("div", {
+    id: "display"
+  }, typeof currentExpression === "object" ? currentExpression.join("") : currentExpression, /* @__PURE__ */ React.createElement(AlwaysScrollToBottom, null)), /* @__PURE__ */ React.createElement("div", {
     className: "button-container"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "top-buttons"
   }, /* @__PURE__ */ React.createElement("div", {
-    className: "calc-label"
-  }, "CALC"), /* @__PURE__ */ React.createElement("button", {
+    className: "calc-label",
+    onClick: handleCalcULater
+  }, "CALC U LATER"), /* @__PURE__ */ React.createElement("button", {
     className: "top-button",
     id: "clear",
     onClick: resetCalculator

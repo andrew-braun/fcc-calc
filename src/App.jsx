@@ -7,9 +7,7 @@ import "./app.scss"
 export default function App() {
 	return (
 		<div className="main-container">
-			<header className="main-header">
-				<h1>Calc U Later!</h1>
-			</header>
+			<header className="main-header"></header>
 			<Calculator />
 		</div>
 	)

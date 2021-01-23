@@ -74,7 +74,19 @@ export default function Calculator() {
 		")",
 	]
 
-	const displayRef = useRef(null)
+	const easterEggArray = [
+		"That's not a button!",
+		"Funny, right?",
+		"Never gonna give you up...",
+		"You found the easter egg!",
+		"Okay, it's a lame joke",
+		"Stop clicking!",
+		"You think you're pretty smart, don't you?",
+		"Okay, you caught me--this button doesn't do anything.",
+		"Have you ever seen a moose?",
+		"A moose once bit my sister.",
+		"What's your favorite color? Mine's #BADA55.",
+	]
 
 	const AlwaysScrollToBottom = () => {
 		const elementRef = useRef()
@@ -84,38 +96,53 @@ export default function Calculator() {
 
 	// Add a number/symbol to the currentExpression
 	function addToCurrentExpression(item) {
-		const lastIndex = currentExpression.length - 1
+		try {
+			const lastIndex = currentExpression.length - 1
+			const alphabeticMath = ["pi", "log(", "ln(", "(", ")"]
 
-		// Remove default leading 0
-		if (currentExpression[0] === 0 && item !== 0) {
-			setCurrentExpression([])
-		}
+			// Remove default leading 0
+			if (
+				(currentExpression[0] === 0 && item !== 0) ||
+				easterEggArray.includes(currentExpression)
+			) {
+				setCurrentExpression([])
+			}
 
-		// Disallow adjacent zeroes
-		if (currentExpression[lastIndex] === 0 && item === 0) {
-			return
-		}
+			// Disallow adjacent zeroes
+			if (currentExpression[lastIndex] === 0 && item === 0) {
+				return
+			}
 
-		// If adjacent symbols are typed in, replace the current with the most recent
-		// Otherwise, assume everything is correct and update with entered item
-
-		if (
-			typeof currentExpression[lastIndex] !== "number" &&
-			typeof item !== "number" &&
-			!["pi", "log", "ln", "(", ")"].includes(currentExpression[lastIndex]) &&
-			!["pi", "log(", "ln(", "(", ")"].includes(item)
-		) {
-			console.log(!["pi", "log(", "ln(", "(", ")"].includes(item))
-			const newCurrentExpression = currentExpression.slice(
-				0,
-				currentExpression.length - 1
-			)
-			setCurrentExpression([...newCurrentExpression, item])
-		} else {
-			setCurrentExpression((previousCurrentExpression) => [
-				...previousCurrentExpression,
-				item,
-			])
+			// If adjacent symbols are typed in, replace the current with the most recent
+			// Otherwise, assume everything is correct and update with entered item
+			if (
+				typeof currentExpression[lastIndex] !== "number" &&
+				typeof item !== "number" &&
+				!alphabeticMath.includes(currentExpression[lastIndex]) &&
+				!alphabeticMath.includes(item)
+			) {
+				console.log(!["pi", "log(", "ln(", "(", ")"].includes(item))
+				const newCurrentExpression = currentExpression.slice(
+					0,
+					currentExpression.length - 1
+				)
+				setCurrentExpression([...newCurrentExpression, item])
+			} else if (
+				["log(", "ln("].includes(item) &&
+				typeof currentExpression[lastIndex] === "number"
+			) {
+				setCurrentExpression((previousCurrentExpression) => [
+					...previousCurrentExpression,
+					`*${item}`,
+				])
+			} else {
+				setCurrentExpression((previousCurrentExpression) => [
+					...previousCurrentExpression,
+					item,
+				])
+			}
+		} catch (err) {
+			console.log(err)
 		}
 	}
 
@@ -133,12 +160,16 @@ export default function Calculator() {
 
 	// Parse and evaluate currentExpression
 	function solveExpression() {
-		const result = parseFloat(
-			Parser.evaluate(currentExpression.join("")).toPrecision(8)
-		)
+		try {
+			const result = parseFloat(
+				Parser.evaluate(currentExpression.join("")).toPrecision(8)
+			)
 
-		console.log(result)
-		setCurrentExpression([result])
+			console.log(result)
+			setCurrentExpression([result])
+		} catch (err) {
+			console.log(err)
+		}
 	}
 
 	function handleClickInput(event) {
@@ -172,17 +203,15 @@ export default function Calculator() {
 			} else if (event.key === "Enter" || event.key === "=") {
 				event.preventDefault()
 				return solveExpression()
-			} else if (allowedKeys.includes(event.key)) {
+			} else if (allowedKeys.includes(event.key.toLowerCase())) {
 				event.preventDefault()
 				if ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9].includes(Number(event.key))) {
 					addToCurrentExpression(Number(event.key))
-				} else if (Object.keys(mathLookup).includes(event.key)) {
-					addToCurrentExpression(mathLookup[event.key])
+				} else if (Object.keys(mathLookup).includes(event.key.toLowerCase())) {
+					addToCurrentExpression(mathLookup[event.key.toLowerCase()])
 				} else {
 					addToCurrentExpression(event.key)
 				}
-			} else {
-				console.log(`${event.key} is not a valid input.`)
 			}
 		}
 
@@ -193,16 +222,28 @@ export default function Calculator() {
 		}
 	}, [currentExpression])
 
+	function handleCalcULater() {
+		console.log(Math.floor(Math.random() * easterEggArray.length))
+
+		setCurrentExpression(
+			easterEggArray[Math.floor(Math.random() * easterEggArray.length)]
+		)
+	}
+
 	// On equals input, parse array according to order of operations
 	return (
 		<div className="calculator" id="calculator">
-			<div className="display" id="display" ref={displayRef}>
-				{currentExpression.join("")}
+			<div className="display" id="display">
+				{typeof currentExpression === "object"
+					? currentExpression.join("")
+					: currentExpression}
 				<AlwaysScrollToBottom />
 			</div>
 			<div className="button-container">
 				<div className="top-buttons">
-					<div className="calc-label">CALC</div>
+					<div className="calc-label" onClick={handleCalcULater}>
+						CALC U LATER
+					</div>
 					<button className="top-button" id="clear" onClick={resetCalculator}>
 						C
 					</button>
