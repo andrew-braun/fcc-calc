@@ -2,41 +2,126 @@ import React, { useState, useEffect, useRef } from "react"
 import { Parser } from "expr-eval"
 import "./calculator.scss"
 
+/* 
+Group types:
+
+Number groups: Can only contain numbers (unlimited). Must be separated by operators.
+Operator groups: Can only contain +, *, /
+Negative groups: Can only contain - (unlimited)
+Special groups: Can only contain a math phrase like x^y, sqrt(x), log(x), ln(x)
+
+1. On first input, create new group: [1]
+2. Add new group to expression: [[1]]
+3. If next input is same type, add it to the current group: [1, 2],
+remove previous group from expression, and add new group
+4. 
+
+*/
+
 export default function Calculator() {
-	const [currentExpression, setCurrentExpression] = useState([0])
+	const [currentExpression, setCurrentExpression] = useState([])
+	const [currentGroup, setCurrentGroup] = useState([0])
+	const [lastInputType, setLastInputType] = useState()
 
 	// Lookup table to convert words to numerals/symbols
 	const mathLookup = {
-		zero: 0,
-		one: 1,
-		two: 2,
-		three: 3,
-		four: 4,
-		five: 5,
-		six: 6,
-		seven: 7,
-		eight: 8,
-		nine: 9,
-		decimal: ".",
-		add: "+",
-		subtract: "-",
-		multiply: "*",
-		divide: "/",
-		equals: "=",
-		factorial: "!",
-		exponent: "^",
-		sqrt: "sqrt ",
-		s: "sqrt ",
-		log: "log(",
-		l: "log(",
-		n: "ln(",
-		ln: "ln(",
-		"(": "(",
-		")": ")",
-		rightParen: ")",
-		leftParen: "(",
-		pi: Number(Math.PI.toPrecision(8)),
-		p: Number(Math.PI.toPrecision(8)),
+		zero: {
+			value: 0,
+			type: "number",
+		},
+		one: {
+			value: 1,
+			type: "number",
+		},
+		two: {
+			value: 2,
+			type: "number",
+		},
+		three: {
+			value: 3,
+			type: "number",
+		},
+		four: {
+			value: 4,
+			type: "number",
+		},
+		five: {
+			value: 5,
+			type: "number",
+		},
+		six: {
+			value: 6,
+			type: "number",
+		},
+		seven: {
+			value: 7,
+			type: "number",
+		},
+		eight: {
+			value: 8,
+			type: "number",
+		},
+		nine: {
+			value: 9,
+			type: "number",
+		},
+		decimal: {
+			value: ".",
+			type: "number",
+		},
+		add: {
+			value: "+",
+			type: "basicOperator",
+		},
+		subtract: {
+			value: "-",
+			type: "basicOperator",
+		},
+		multiply: {
+			value: "*",
+			type: "basicOperator",
+		},
+		divide: {
+			value: "/",
+			type: "basicOperator",
+		},
+		equals: {
+			value: "=",
+			type: "basicOperator",
+		},
+		factorial: {
+			value: "!",
+			type: "basicOperator",
+		},
+		exponent: {
+			value: "^",
+			type: "basicOperator",
+		},
+		sqrt: {
+			value: "sqrt(",
+			type: "specialOperator",
+		},
+		log: {
+			value: "log(",
+			type: "specialOperator",
+		},
+		ln: {
+			value: "ln(",
+			type: "specialOperator",
+		},
+
+		leftParen: {
+			value: "(",
+			type: "paren",
+		},
+		rightParen: {
+			value: ")",
+			type: "paren",
+		},
+		pi: {
+			value: Number(Math.PI.toPrecision(8)),
+			type: "pi",
+		},
 	}
 
 	// Restrict entered keys to mathematical symbols
@@ -88,63 +173,55 @@ export default function Calculator() {
 		"What's your favorite color? Mine's #BADA55.",
 	]
 
-	const AlwaysScrollToBottom = () => {
-		const elementRef = useRef()
-		useEffect(() => elementRef.current.scrollIntoView())
-		return <div ref={elementRef} />
-	}
+	function validateInput(group, input) {
+		let validatedGroup
 
-	// Add a number/symbol to the currentExpression
-	function addToCurrentExpression(item) {
-		try {
-			const lastIndex = currentExpression.length - 1
-			const alphabeticMath = ["pi", "log(", "ln(", "(", ")"]
-
-			// Remove default leading 0
-			if (
-				(currentExpression[0] === 0 && item !== 0) ||
-				easterEggArray.includes(currentExpression)
-			) {
-				setCurrentExpression([])
-			}
-
-			// Disallow adjacent zeroes
-			if (currentExpression[lastIndex] === 0 && item === 0) {
-				return
-			}
-
-			// If adjacent symbols are typed in, replace the current with the most recent
-			// Otherwise, assume everything is correct and update with entered item
-			if (
-				typeof currentExpression[lastIndex] !== "number" &&
-				typeof item !== "number" &&
-				!alphabeticMath.includes(currentExpression[lastIndex]) &&
-				!alphabeticMath.includes(item)
-			) {
-				console.log(!["pi", "log(", "ln(", "(", ")"].includes(item))
-				const newCurrentExpression = currentExpression.slice(
-					0,
-					currentExpression.length - 1
-				)
-				setCurrentExpression([...newCurrentExpression, item])
-			} else if (
-				["log(", "ln("].includes(item) &&
-				typeof currentExpression[lastIndex] === "number"
-			) {
-				setCurrentExpression((previousCurrentExpression) => [
-					...previousCurrentExpression,
-					`*${item}`,
-				])
-			} else {
-				setCurrentExpression((previousCurrentExpression) => [
-					...previousCurrentExpression,
-					item,
-				])
-			}
-		} catch (err) {
-			console.log(err)
+		if (input.value === 0 || group[0] === 0) {
+			validatedGroup = validateZeros(group, input)
 		}
+
+		return validatedGroup
 	}
+
+	function validateGroupDecimals(group, item) {
+		const validatedGroup = group.find((element) => element == ".")
+			? group
+			: [...group, item]
+
+		return validatedGroup
+	}
+
+	function validateZeros(group, input) {}
+
+	function processInput(input) {
+		if (currentGroup[0] === 0) {
+			setCurrentGroup([input.value])
+		} else if (input.type === lastInputType) {
+			addToCurrentGroup(input.value)
+		} else {
+			createNewGroup(input)
+		}
+		setLastInputType(input.type)
+	}
+
+	function createNewGroup(input) {
+		setCurrentExpression((previousCurrentExpression) => [
+			...previousCurrentExpression,
+			[],
+		])
+		setCurrentGroup([input.value])
+	}
+
+	function addToCurrentGroup(input) {
+		setCurrentGroup((previousCurrentGroup) => [...previousCurrentGroup, input])
+	}
+
+	useEffect(() => {
+		setCurrentExpression((previousCurrentExpression) => [
+			...previousCurrentExpression.slice(0, -1),
+			currentGroup,
+		])
+	}, [currentGroup])
 
 	// Remove the last number/symbol from currentExpression
 	function backspaceInput() {
@@ -155,6 +232,7 @@ export default function Calculator() {
 
 	// Wipe calculator for restart
 	function resetCalculator() {
+		setCurrentGroup([0])
 		setCurrentExpression([0])
 	}
 
@@ -162,10 +240,9 @@ export default function Calculator() {
 	function solveExpression() {
 		try {
 			const result = parseFloat(
-				Parser.evaluate(currentExpression.join("")).toPrecision(8)
+				Parser.evaluate(currentExpression.flat().join("")).toPrecision(8)
 			)
 
-			console.log(result)
 			setCurrentExpression([result])
 		} catch (err) {
 			console.log(err)
@@ -185,7 +262,7 @@ export default function Calculator() {
 		if (input === "equals") {
 			solveExpression()
 		} else if (mathLookup[input] || input === "zero") {
-			addToCurrentExpression(mathLookup[input])
+			processInput(mathLookup[input])
 		} else {
 			console.log("Not a valid input.")
 		}
@@ -230,12 +307,19 @@ export default function Calculator() {
 		)
 	}
 
+	// Component that ensures calculator always scrolls down on overflow
+	const AlwaysScrollToBottom = () => {
+		const elementRef = useRef()
+		useEffect(() => elementRef.current.scrollIntoView())
+		return <div ref={elementRef} />
+	}
+
 	// On equals input, parse array according to order of operations
 	return (
 		<div className="calculator" id="calculator">
 			<div className="display" id="display">
 				{typeof currentExpression === "object"
-					? currentExpression.join("")
+					? currentExpression.flat().join("")
 					: currentExpression}
 				<AlwaysScrollToBottom />
 			</div>

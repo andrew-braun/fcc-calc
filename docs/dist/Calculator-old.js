@@ -2,106 +2,38 @@ import React, {useState, useEffect, useRef} from "../_snowpack/pkg/react.js";
 import {Parser} from "../_snowpack/pkg/expr-eval.js";
 import "./calculator.css.proxy.js";
 export default function Calculator() {
-  const [currentExpression, setCurrentExpression] = useState([]);
-  const [currentGroup, setCurrentGroup] = useState([0]);
-  const [lastInputType, setLastInputType] = useState();
+  const [currentExpression, setCurrentExpression] = useState([0]);
   const mathLookup = {
-    zero: {
-      value: 0,
-      type: "number"
-    },
-    one: {
-      value: 1,
-      type: "number"
-    },
-    two: {
-      value: 2,
-      type: "number"
-    },
-    three: {
-      value: 3,
-      type: "number"
-    },
-    four: {
-      value: 4,
-      type: "number"
-    },
-    five: {
-      value: 5,
-      type: "number"
-    },
-    six: {
-      value: 6,
-      type: "number"
-    },
-    seven: {
-      value: 7,
-      type: "number"
-    },
-    eight: {
-      value: 8,
-      type: "number"
-    },
-    nine: {
-      value: 9,
-      type: "number"
-    },
-    decimal: {
-      value: ".",
-      type: "number"
-    },
-    add: {
-      value: "+",
-      type: "basicOperator"
-    },
-    subtract: {
-      value: "-",
-      type: "basicOperator"
-    },
-    multiply: {
-      value: "*",
-      type: "basicOperator"
-    },
-    divide: {
-      value: "/",
-      type: "basicOperator"
-    },
-    equals: {
-      value: "=",
-      type: "basicOperator"
-    },
-    factorial: {
-      value: "!",
-      type: "basicOperator"
-    },
-    exponent: {
-      value: "^",
-      type: "basicOperator"
-    },
-    sqrt: {
-      value: "sqrt(",
-      type: "specialOperator"
-    },
-    log: {
-      value: "log(",
-      type: "specialOperator"
-    },
-    ln: {
-      value: "ln(",
-      type: "specialOperator"
-    },
-    leftParen: {
-      value: "(",
-      type: "paren"
-    },
-    rightParen: {
-      value: ")",
-      type: "paren"
-    },
-    pi: {
-      value: Number(Math.PI.toPrecision(8)),
-      type: "pi"
-    }
+    zero: 0,
+    one: 1,
+    two: 2,
+    three: 3,
+    four: 4,
+    five: 5,
+    six: 6,
+    seven: 7,
+    eight: 8,
+    nine: 9,
+    decimal: ".",
+    add: "+",
+    subtract: "-",
+    multiply: "*",
+    divide: "/",
+    equals: "=",
+    factorial: "!",
+    exponent: "^",
+    sqrt: "sqrt ",
+    s: "sqrt ",
+    log: "log(",
+    l: "log(",
+    n: "ln(",
+    ln: "ln(",
+    "(": "(",
+    ")": ")",
+    rightParen: ")",
+    leftParen: "(",
+    pi: Number(Math.PI.toPrecision(8)),
+    p: Number(Math.PI.toPrecision(8))
   };
   const allowedKeys = [
     "0",
@@ -149,55 +81,67 @@ export default function Calculator() {
     "A moose once bit my sister.",
     "What's your favorite color? Mine's #BADA55."
   ];
-  function validateInput(group, input) {
-    let validatedGroup;
-    if (input.value === 0 || group[0] === 0) {
-      validatedGroup = validateZeros(group, input);
+  const AlwaysScrollToBottom = () => {
+    const elementRef = useRef();
+    useEffect(() => elementRef.current.scrollIntoView());
+    return /* @__PURE__ */ React.createElement("div", {
+      ref: elementRef
+    });
+  };
+  function addToCurrentExpression(item) {
+    try {
+      const lastIndex = currentExpression.length - 1;
+      const alphabeticMath = ["pi", "log(", "ln(", "(", ")"];
+      if (currentExpression[0] === 0 && item !== 0 || easterEggArray.includes(currentExpression)) {
+        setCurrentExpression([]);
+      }
+      if (currentExpression[lastIndex] === 0 && item === 0) {
+        return;
+      }
+      if (currentExpression.length > 0 && item !== "-" && currentExpression[lastIndex] !== "-" && typeof currentExpression[lastIndex] !== "number" && typeof item !== "number" && !alphabeticMath.includes(currentExpression[lastIndex]) && !alphabeticMath.includes(item)) {
+        const newCurrentExpression = currentExpression.slice(0, currentExpression.length - 1);
+        setCurrentExpression([...newCurrentExpression, item]);
+      } else if (["log(", "ln("].includes(item) && typeof currentExpression[lastIndex] === "number") {
+        setCurrentExpression((previousCurrentExpression) => [
+          ...previousCurrentExpression,
+          `*${item}`
+        ]);
+      } else if (item === ".") {
+        const strippedExpression = [
+          ...currentExpression.filter((char) => typeof char !== "number"),
+          item
+        ];
+        console.log(strippedExpression);
+        for (let i = strippedExpression.length - 1; i > 0; i--) {
+          if (strippedExpression[i] === "." && strippedExpression[i - 1] === ".") {
+            return;
+          }
+        }
+        setCurrentExpression((previousCurrentExpression) => [
+          ...previousCurrentExpression,
+          item
+        ]);
+      } else {
+        console.log(item);
+        setCurrentExpression((previousCurrentExpression) => [
+          ...previousCurrentExpression,
+          item
+        ]);
+      }
+    } catch (err) {
+      console.log(err);
     }
-    return validatedGroup;
   }
-  function validateGroupDecimals(group, item) {
-    const validatedGroup = group.find((element) => element == ".") ? group : [...group, item];
-    return validatedGroup;
-  }
-  function validateZeros(group, input) {
-  }
-  function processInput(input) {
-    if (currentGroup[0] === 0) {
-      setCurrentGroup([input.value]);
-    } else if (input.type === lastInputType) {
-      addToCurrentGroup(input.value);
-    } else {
-      createNewGroup(input);
-    }
-    setLastInputType(input.type);
-  }
-  function createNewGroup(input) {
-    setCurrentExpression((previousCurrentExpression) => [
-      ...previousCurrentExpression,
-      []
-    ]);
-    setCurrentGroup([input.value]);
-  }
-  function addToCurrentGroup(input) {
-    setCurrentGroup((previousCurrentGroup) => [...previousCurrentGroup, input]);
-  }
-  useEffect(() => {
-    setCurrentExpression((previousCurrentExpression) => [
-      ...previousCurrentExpression.slice(0, -1),
-      currentGroup
-    ]);
-  }, [currentGroup]);
   function backspaceInput() {
     setCurrentExpression((previousCurrentExpression) => previousCurrentExpression.slice(0, -1));
   }
   function resetCalculator() {
-    setCurrentGroup([0]);
     setCurrentExpression([0]);
   }
   function solveExpression() {
     try {
-      const result = parseFloat(Parser.evaluate(currentExpression.flat().join("")).toPrecision(8));
+      const result = parseFloat(Parser.evaluate(currentExpression.join("")).toPrecision(8));
+      console.log(result);
       setCurrentExpression([result]);
     } catch (err) {
       console.log(err);
@@ -208,7 +152,7 @@ export default function Calculator() {
     if (input === "equals") {
       solveExpression();
     } else if (mathLookup[input] || input === "zero") {
-      processInput(mathLookup[input]);
+      addToCurrentExpression(mathLookup[input]);
     } else {
       console.log("Not a valid input.");
     }
@@ -244,20 +188,13 @@ export default function Calculator() {
     console.log(Math.floor(Math.random() * easterEggArray.length));
     setCurrentExpression(easterEggArray[Math.floor(Math.random() * easterEggArray.length)]);
   }
-  const AlwaysScrollToBottom = () => {
-    const elementRef = useRef();
-    useEffect(() => elementRef.current.scrollIntoView());
-    return /* @__PURE__ */ React.createElement("div", {
-      ref: elementRef
-    });
-  };
   return /* @__PURE__ */ React.createElement("div", {
     className: "calculator",
     id: "calculator"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "display",
     id: "display"
-  }, typeof currentExpression === "object" ? currentExpression.flat().join("") : currentExpression, /* @__PURE__ */ React.createElement(AlwaysScrollToBottom, null)), /* @__PURE__ */ React.createElement("div", {
+  }, typeof currentExpression === "object" ? currentExpression.join("") : currentExpression, /* @__PURE__ */ React.createElement(AlwaysScrollToBottom, null)), /* @__PURE__ */ React.createElement("div", {
     className: "button-container"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "top-buttons"
