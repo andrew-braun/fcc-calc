@@ -174,26 +174,42 @@ export default function Calculator() {
 	]
 
 	function validateInput(group, input) {
-		let validatedGroup
+		let valid = true
 
-		if (input.value === 0 || group[0] === 0) {
-			validatedGroup = validateZeros(group, input)
+		if (input.type === "number") {
+			if (validateNumberGroup(currentGroup, input) === false) {
+				valid = false
+			}
 		}
-
-		return validatedGroup
+		if (input.type === "symbol") {
+			if (validateSymbolGroup(currentGroup, input) === false) {
+				valid = false
+			}
+		}
+		return valid
 	}
 
-	function validateGroupDecimals(group, item) {
-		const validatedGroup = group.find((element) => element == ".")
-			? group
-			: [...group, item]
+	function validateNumberGroup(group, input) {
+		let valid = true
 
-		return validatedGroup
+		if (input.value === "." && group.find((element) => element === ".")) {
+			valid = false
+		}
+
+		return valid
+	}
+
+	function validateSymbolGroup(group, input) {
+		let valid = true
 	}
 
 	function validateZeros(group, input) {}
 
 	function processInput(input) {
+		if (!validateNumberGroup(currentGroup, input)) {
+			return
+		}
+
 		if (currentGroup[0] === 0) {
 			setCurrentGroup([input.value])
 		} else if (input.type === lastInputType) {
