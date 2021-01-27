@@ -177,36 +177,40 @@ export default function Calculator() {
 		let valid = true
 
 		if (input.type === "number") {
-			if (validateNumberGroup(currentGroup, input) === false) {
+			if (input.value === "." && group.find((element) => element === ".")) {
 				valid = false
 			}
-		}
-		if (input.type === "symbol") {
-			if (validateSymbolGroup(currentGroup, input) === false) {
+		} else if (input.type === "basicOperator") {
+			console.log("basicOperator")
+			if (
+				lastInputType === "basicOperator" &&
+				currentGroup.length >= 1 &&
+				input.value !== "-"
+			) {
+				setCurrentGroup([input.value])
 				valid = false
 			}
-		}
-		return valid
-	}
-
-	function validateNumberGroup(group, input) {
-		let valid = true
-
-		if (input.value === "." && group.find((element) => element === ".")) {
+		} else if (input.type === "specialOperator") {
+			console.log(
+				currentExpression.flat().slice(0, -1).type !== "basicOperator"
+			)
+			console.log("You're special!")
+			if (currentExpression.flat().slice(0, -1).type !== "basicOperator") {
+				console.log("Ya not basic")
+				setCurrentGroup((previousCurrentGroup) => [
+					...previousCurrentGroup,
+					"*",
+					input.value,
+				])
+			}
 			valid = false
 		}
 
 		return valid
 	}
 
-	function validateSymbolGroup(group, input) {
-		let valid = true
-	}
-
-	function validateZeros(group, input) {}
-
 	function processInput(input) {
-		if (!validateNumberGroup(currentGroup, input)) {
+		if (!validateInput(currentGroup, input)) {
 			return
 		}
 

@@ -150,19 +150,36 @@ export default function Calculator() {
     "What's your favorite color? Mine's #BADA55."
   ];
   function validateInput(group, input) {
-    let validatedGroup;
-    if (input.value === 0 || group[0] === 0) {
-      validatedGroup = validateZeros(group, input);
+    let valid = true;
+    if (input.type === "number") {
+      if (input.value === "." && group.find((element) => element === ".")) {
+        valid = false;
+      }
+    } else if (input.type === "basicOperator") {
+      console.log("basicOperator");
+      if (lastInputType === "basicOperator" && currentGroup.length >= 1 && input.value !== "-") {
+        setCurrentGroup([input.value]);
+        valid = false;
+      }
+    } else if (input.type === "specialOperator") {
+      console.log(currentExpression.flat().slice(0, -1).type !== "basicOperator");
+      console.log("You're special!");
+      if (currentExpression.flat().slice(0, -1).type !== "basicOperator") {
+        console.log("Ya not basic");
+        setCurrentGroup((previousCurrentGroup) => [
+          ...previousCurrentGroup,
+          "*",
+          input.value
+        ]);
+      }
+      valid = false;
     }
-    return validatedGroup;
-  }
-  function validateGroupDecimals(group, item) {
-    const validatedGroup = group.find((element) => element == ".") ? group : [...group, item];
-    return validatedGroup;
-  }
-  function validateZeros(group, input) {
+    return valid;
   }
   function processInput(input) {
+    if (!validateInput(currentGroup, input)) {
+      return;
+    }
     if (currentGroup[0] === 0) {
       setCurrentGroup([input.value]);
     } else if (input.type === lastInputType) {
