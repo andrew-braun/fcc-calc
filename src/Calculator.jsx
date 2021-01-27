@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef, useCallback } from "react"
 import { Parser } from "expr-eval"
 import "./calculator.scss"
 
@@ -91,7 +91,7 @@ export default function Calculator() {
 		},
 		factorial: {
 			value: "!",
-			type: "basicOperator",
+			type: "factorial",
 		},
 		exponent: {
 			value: "^",
@@ -125,39 +125,40 @@ export default function Calculator() {
 	}
 
 	// Restrict entered keys to mathematical symbols
-	const allowedKeys = [
-		"0",
-		"1",
-		"2",
-		"3",
-		"4",
-		"5",
-		"6",
-		"7",
-		"8",
-		"9",
-		".",
-		"+",
-		"-",
-		"*",
-		"x",
-		"X",
-		"/",
-		"=",
-		"!",
-		"^",
-		"Backspace",
-		"c",
-		"C",
-		"p",
-		"P",
-		"l",
-		"L",
-		"n",
-		"N",
-		"(",
-		")",
-	]
+	const keyboardLookup = {
+		0: "zero",
+		1: "one",
+		2: "two",
+		3: "three",
+		4: "four",
+		5: "five",
+		6: "six",
+		7: "seven",
+		8: "eight",
+		9: "nine",
+		".": "decimal",
+		"+": "add",
+		"-": "subtract",
+		"*": "multiply",
+		x: "multiply",
+		X: "multiply",
+		"/": "divide",
+		"=": "equals",
+		Enter: "equals",
+		"!": "factorial",
+		"^": "exponent",
+		Backspace: "backspace",
+		c: "clear",
+		C: "clear",
+		p: "pi",
+		P: "pi",
+		l: "log",
+		L: "log",
+		n: "ln",
+		N: "ln",
+		"(": "leftParen",
+		")": "rightParen",
+	}
 
 	const easterEggArray = [
 		"That's not a button!",
@@ -173,15 +174,26 @@ export default function Calculator() {
 		"What's your favorite color? Mine's #BADA55.",
 	]
 
+	// Run validator on every input to ensure it follows rules
 	function validateInput(group, input) {
 		let valid = true
 
+		// Remove leading 0
+		if (currentGroup[0] === 0) {
+			setCurrentGroup(() => [input.value])
+			valid = false
+		}
+
+		// validate number inputs
 		if (input.type === "number") {
+			// Make sure number groups don't contain more than one decimal
 			if (input.value === "." && group.find((element) => element === ".")) {
 				valid = false
+				return
 			}
 		} else if (input.type === "basicOperator") {
-			console.log("basicOperator")
+			// Make sure basic operator groups only contain one operator
+			// Except - signs, which can be unlimited
 			if (
 				lastInputType === "basicOperator" &&
 				currentGroup.length >= 1 &&
@@ -191,12 +203,8 @@ export default function Calculator() {
 				valid = false
 			}
 		} else if (input.type === "specialOperator") {
-			console.log(
-				currentExpression.flat().slice(0, -1).type !== "basicOperator"
-			)
-			console.log("You're special!")
+			// if there isn't already a basic operator, insert a * before a special operator
 			if (currentExpression.flat().slice(0, -1).type !== "basicOperator") {
-				console.log("Ya not basic")
 				setCurrentGroup((previousCurrentGroup) => [
 					...previousCurrentGroup,
 					"*",
@@ -209,33 +217,51 @@ export default function Calculator() {
 		return valid
 	}
 
+	/* Receive input value from mathLookup, validate, 
+	and either delegate to current group or create new group */
 	function processInput(input) {
-		if (!validateInput(currentGroup, input)) {
+		if (
+			!validateInput(currentGroup, input) &&
+			!["backspace", "=", "clear"].includes(input.value)
+		) {
 			return
 		}
 
-		if (currentGroup[0] === 0) {
-			setCurrentGroup([input.value])
+		if (input.value === "=") {
+			solveExpression()
+		} else if (input.value === "backspace") {
+			backspaceInput()
+		} else if (input.value === "clear") {
+			resetCalculator()
 		} else if (input.type === lastInputType) {
 			addToCurrentGroup(input.value)
+			setLastInputType(input.type)
 		} else {
-			createNewGroup(input)
+			createNewGroup(input.value)
+			setLastInputType(input.type)
 		}
-		setLastInputType(input.type)
 	}
 
-	function createNewGroup(input) {
+	/* Create a blank array in currentExpression and set current group to input
+	Blank group necessary because expression always truncates to replace last element
+	with updated group */
+	function createNewGroup(value) {
 		setCurrentExpression((previousCurrentExpression) => [
 			...previousCurrentExpression,
 			[],
 		])
-		setCurrentGroup([input.value])
+		// Reset current group to only new input value
+		setCurrentGroup(() => [value])
 	}
 
-	function addToCurrentGroup(input) {
-		setCurrentGroup((previousCurrentGroup) => [...previousCurrentGroup, input])
+	// Simply adds the input to the current group which triggers expression update
+	function addToCurrentGroup(value) {
+		setCurrentGroup((previousCurrentGroup) => [...previousCurrentGroup, value])
 	}
 
+	/* Set current expression to watch group for updates 
+	On group update, replace previous last array with current group
+	*/
 	useEffect(() => {
 		setCurrentExpression((previousCurrentExpression) => [
 			...previousCurrentExpression.slice(0, -1),
@@ -246,26 +272,47 @@ export default function Calculator() {
 	// Remove the last number/symbol from currentExpression
 	function backspaceInput() {
 		setCurrentExpression((previousCurrentExpression) =>
-			previousCurrentExpression.slice(0, -1)
+			previousCurrentExpression.flat().slice(0, -1)
 		)
 	}
 
 	// Wipe calculator for restart
 	function resetCalculator() {
-		setCurrentGroup([0])
-		setCurrentExpression([0])
+		setCurrentGroup(() => [0])
+		setCurrentExpression(() => [0])
 	}
 
 	// Parse and evaluate currentExpression
 	function solveExpression() {
-		try {
-			const result = parseFloat(
-				Parser.evaluate(currentExpression.flat().join("")).toPrecision(8)
-			)
+		console.log(currentExpression)
+		console.log(currentGroup)
+		if (lastInputType !== "basicOperator") {
+			let result = Parser.evaluate(currentExpression.flat().join(""))
+
+			// if (
+			// 	currentExpression.flat()[currentExpression.length] === "." &&
+			// 	!result
+			// 		.toString()
+			// 		.split("")
+			// 		.some((element) => element === ".")
+			// ) {
+			// 	result = `${result.toString()}.0`
+			// }
+
+			// if (
+			// 	!result
+			// 		.toString()
+			// 		.split("")
+			// 		.some((element) => element === ".") &&
+			// 	currentExpression.flat().some((element) => element === ".")
+			// ) {
+			// 	result = `${result.toString()}.0`
+			// }
+			// if (currentExpression.flat(2)[currentExpression.length - 1] === ".") {
+			// 	result += ".0"
+			// }
 
 			setCurrentExpression([result])
-		} catch (err) {
-			console.log(err)
 		}
 	}
 
@@ -279,9 +326,8 @@ export default function Calculator() {
 		and add to currentExpression 
 		else, not valid input
 		*/
-		if (input === "equals") {
-			solveExpression()
-		} else if (mathLookup[input] || input === "zero") {
+
+		if (mathLookup[input] || input === "zero") {
 			processInput(mathLookup[input])
 		} else {
 			console.log("Not a valid input.")
@@ -291,24 +337,19 @@ export default function Calculator() {
 	// Add keyboard event listener in useEffect
 	useEffect(() => {
 		function handleKeyboardInput(event) {
-			if (event.key === "Backspace") {
+			if (Object.keys(keyboardLookup).includes(event.key)) {
 				event.preventDefault()
-				return backspaceInput()
-			} else if (event.key.toLowerCase() === "c") {
-				event.preventDefault()
-				return resetCalculator()
-			} else if (event.key === "Enter" || event.key === "=") {
-				event.preventDefault()
-				return solveExpression()
-			} else if (allowedKeys.includes(event.key.toLowerCase())) {
-				event.preventDefault()
-				if ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9].includes(Number(event.key))) {
-					addToCurrentExpression(Number(event.key))
-				} else if (Object.keys(mathLookup).includes(event.key.toLowerCase())) {
-					addToCurrentExpression(mathLookup[event.key.toLowerCase()])
-				} else {
-					addToCurrentExpression(event.key)
+
+				if (["=", "Enter"].includes(event.key)) {
+					solveExpression()
+					return
 				}
+
+				const input = mathLookup[keyboardLookup[event.key]] ?? {
+					value: keyboardLookup[event.key],
+				}
+
+				processInput(input)
 			}
 		}
 
@@ -317,11 +358,9 @@ export default function Calculator() {
 		return () => {
 			window.removeEventListener("keydown", handleKeyboardInput)
 		}
-	}, [currentExpression])
+	}, [currentExpression, currentGroup])
 
 	function handleCalcULater() {
-		console.log(Math.floor(Math.random() * easterEggArray.length))
-
 		setCurrentExpression(
 			easterEggArray[Math.floor(Math.random() * easterEggArray.length)]
 		)
